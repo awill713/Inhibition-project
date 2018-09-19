@@ -8,6 +8,9 @@ close all;
 %% Load parameters
 [miscParams dendParams condParams ] = loadParameters;
 
+simCount = 100;
+nodesInCluster = 4;
+clustMat = zeros(100,nodesInCluster)
 
 %% Build dendritic arbor
 [connectome compartmentIDs conductanceMat distance] = buildDendriticArbor(dendParams);
@@ -18,111 +21,111 @@ totalCompartments = size(compartmentIDs,2);
 % SUB/SUPRALINEAR SUMMATION OF SPINES AND SHAFTS IN APICAL OR BASAL
 % DENDRITES
 
-%% Apical shaft - specify excitatory and inhibitory input
-iExcite = zeros(10,totalCompartments,miscParams.time);
-iInhibit = zeros(10,totalCompartments,miscParams.time);
-
-stimCompartment = max(find(compartmentIDs(2,:)==3)); %most distal shaft
-for intense = 1:10
-    iExcite(intense,stimCompartment,150:200) = intense;
-end
-
-maxV = zeros(1,size(iExcite,1));
-
-%% Apical shaft - run model
-for exp = 1:size(iExcite,1)
-    exp
-    input.excitation = squeeze(iExcite(exp,:,:));
-    input.inhibition = squeeze(iInhibit(exp,:,:));
-    voltages = runTemp(conductanceMat, compartmentIDs, input, condParams);
-    maxV(exp) = max(voltages(1,:));
-end
-figure;plot(maxV);
-hold on;
-plot(-60+(maxV(1,1)+60).*(1:1:10));
-legend('Observed','Predicted');
-title('Apical shaft excitation is (sub)linear');
-
-iExcite = zeros(10,totalCompartments,miscParams.time);
-iInhibit = zeros(10,totalCompartments,miscParams.time);
-
-%% Apical spine - specify excitatory and inhibitory input
-stimCompartment = max(find(compartmentIDs(2,:)==4)); %most distal apical spine
-for intense = 1:10
-    iExcite(intense,stimCompartment,150:200) = intense;
-end
-
-maxV = zeros(1,size(iExcite,1));
-
-%% Apical spine - run model
-for exp = 1:size(iExcite,1)
-    exp
-    input.excitation = squeeze(iExcite(exp,:,:));
-    input.inhibition = squeeze(iInhibit(exp,:,:));
-    voltages = runTemp(conductanceMat, compartmentIDs, input, condParams);
-    maxV(exp) = max(voltages(1,:));
-end
-figure;plot(maxV);
-hold on;
-plot(-60+(maxV(1,1)+60).*(1:1:10));
-legend('Observed','Predicted');
-title('Apical spine excitation is supralinear');
-
-%% Basal shaft - specify excitatory and inhibitory input
-iExcite = zeros(10,totalCompartments,miscParams.time);
-iInhibit = zeros(10,totalCompartments,miscParams.time);
-
-stimCompartment = max(find(compartmentIDs(2,:)==1)); %most distal basal shaft
-for intense = 1:10
-    iExcite(intense,stimCompartment,150:200) = intense;
-end
-
-maxV = zeros(1,size(iExcite,1));
-
-%% Basal shaft - run model
-for exp = 1:size(iExcite,1)
-    exp
-    input.excitation = squeeze(iExcite(exp,:,:));
-    input.inhibition = squeeze(iInhibit(exp,:,:));
-    voltages = runTemp(conductanceMat, compartmentIDs, input, condParams);
-    maxV(exp) = max(voltages(1,:));
-end
-figure;plot(maxV);
-hold on;
-plot(-60+(maxV(1,1)+60).*(1:1:10));
-legend('Observed','Predicted');
-title('Basal shaft excitation is (sub)linear');
-
-iExcite = zeros(10,totalCompartments,miscParams.time);
-iInhibit = zeros(10,totalCompartments,miscParams.time);
-
-%% Basal spine - specify excitatory and inhibitory input
-iExcite = zeros(10,totalCompartments,miscParams.time);
-iInhibit = zeros(10,totalCompartments,miscParams.time);
-
-stimCompartment = max(find(connectome(max(find(compartmentIDs(2,:)==1)),:))); %most distal basal spine
-for intense = 1:10
-    iExcite(intense,stimCompartment,150:200) = intense;
-end
-
-maxV = zeros(1,size(iExcite,1));
-
-%% Basal spine - run model
-for exp = 1:size(iExcite,1)
-    exp
-    input.excitation = squeeze(iExcite(exp,:,:));
-    input.inhibition = squeeze(iInhibit(exp,:,:));
-    voltages = runTemp(conductanceMat, compartmentIDs, input, condParams);
-    maxV(exp) = max(voltages(1,:));
-end
-figure;plot(maxV);
-hold on;
-plot(-60+(maxV(1,1)+60).*(1:1:10));
-legend('Observed','Predicted');
-title('Basal spine excitation is supralinear');
-
-iExcite = zeros(10,totalCompartments,miscParams.time);
-iInhibit = zeros(10,totalCompartments,miscParams.time);
+% %% Apical shaft - specify excitatory and inhibitory input
+% iExcite = zeros(10,totalCompartments,miscParams.time);
+% iInhibit = zeros(10,totalCompartments,miscParams.time);
+% 
+% stimCompartment = max(find(compartmentIDs(2,:)==3)); %most distal shaft
+% for intense = 1:10
+%     iExcite(intense,stimCompartment,150:200) = intense;
+% end
+% 
+% maxV = zeros(1,size(iExcite,1));
+% 
+% %% Apical shaft - run model
+% for exp = 1:size(iExcite,1)
+%     exp
+%     input.excitation = squeeze(iExcite(exp,:,:));
+%     input.inhibition = squeeze(iInhibit(exp,:,:));
+%     voltages = runSimulation(conductanceMat, compartmentIDs, input, condParams);
+%     maxV(exp) = max(voltages(1,:));
+% end
+% figure;plot(maxV);
+% hold on;
+% plot(-60+(maxV(1,1)+60).*(1:1:10));
+% legend('Observed','Predicted');
+% title('Apical shaft excitation is (sub)linear');
+% 
+% iExcite = zeros(10,totalCompartments,miscParams.time);
+% iInhibit = zeros(10,totalCompartments,miscParams.time);
+% 
+% %% Apical spine - specify excitatory and inhibitory input
+% stimCompartment = max(find(compartmentIDs(2,:)==4)); %most distal apical spine
+% for intense = 1:10
+%     iExcite(intense,stimCompartment,150:200) = intense;
+% end
+% 
+% maxV = zeros(1,size(iExcite,1));
+% 
+% %% Apical spine - run model
+% for exp = 1:size(iExcite,1)
+%     exp
+%     input.excitation = squeeze(iExcite(exp,:,:));
+%     input.inhibition = squeeze(iInhibit(exp,:,:));
+%     voltages = runSimulation(conductanceMat, compartmentIDs, input, condParams);
+%     maxV(exp) = max(voltages(1,:));
+% end
+% figure;plot(maxV);
+% hold on;
+% plot(-60+(maxV(1,1)+60).*(1:1:10));
+% legend('Observed','Predicted');
+% title('Apical spine excitation is supralinear');
+% 
+% %% Basal shaft - specify excitatory and inhibitory input
+% iExcite = zeros(10,totalCompartments,miscParams.time);
+% iInhibit = zeros(10,totalCompartments,miscParams.time);
+% 
+% stimCompartment = max(find(compartmentIDs(2,:)==1)); %most distal basal shaft
+% for intense = 1:10
+%     iExcite(intense,stimCompartment,150:200) = intense;
+% end
+% 
+% maxV = zeros(1,size(iExcite,1));
+% 
+% %% Basal shaft - run model
+% for exp = 1:size(iExcite,1)
+%     exp
+%     input.excitation = squeeze(iExcite(exp,:,:));
+%     input.inhibition = squeeze(iInhibit(exp,:,:));
+%     voltages = runSimulation(conductanceMat, compartmentIDs, input, condParams);
+%     maxV(exp) = max(voltages(1,:));
+% end
+% figure;plot(maxV);
+% hold on;
+% plot(-60+(maxV(1,1)+60).*(1:1:10));
+% legend('Observed','Predicted');
+% title('Basal shaft excitation is (sub)linear');
+% 
+% iExcite = zeros(10,totalCompartments,miscParams.time);
+% iInhibit = zeros(10,totalCompartments,miscParams.time);
+% 
+% %% Basal spine - specify excitatory and inhibitory input
+% iExcite = zeros(10,totalCompartments,miscParams.time);
+% iInhibit = zeros(10,totalCompartments,miscParams.time);
+% 
+% stimCompartment = max(find(connectome(max(find(compartmentIDs(2,:)==1)),:))); %most distal basal spine
+% for intense = 1:10
+%     iExcite(intense,stimCompartment,150:200) = intense;
+% end
+% 
+% maxV = zeros(1,size(iExcite,1));
+% 
+% %% Basal spine - run model
+% for exp = 1:size(iExcite,1)
+%     exp
+%     input.excitation = squeeze(iExcite(exp,:,:));
+%     input.inhibition = squeeze(iInhibit(exp,:,:));
+%     voltages = runSimulation(conductanceMat, compartmentIDs, input, condParams);
+%     maxV(exp) = max(voltages(1,:));
+% end
+% figure;plot(maxV);
+% hold on;
+% plot(-60+(maxV(1,1)+60).*(1:1:10));
+% legend('Observed','Predicted');
+% title('Basal spine excitation is supralinear');
+% 
+% iExcite = zeros(10,totalCompartments,miscParams.time);
+% iInhibit = zeros(10,totalCompartments,miscParams.time);
         
 %%
 % THE NEXT SECTION IS LOOKING AT THE INTEGRATION OF CLUSTERED VS DIFFUSE
@@ -130,7 +133,7 @@ iInhibit = zeros(10,totalCompartments,miscParams.time);
 
 %% Choose compartments for clustered and diffuse excitation conditions
 
-nodesInCluster = 4;
+% nodesInCluster = 4;
 %find four clustered and diffuse spines
 %clustered:
 % originalSpine = max(find(compartmentIDs(2,:)==4));
@@ -178,7 +181,7 @@ for exp = 1:size(iExcite,1)
     exp
     input.excitation = squeeze(iExcite(exp,:,:));
     input.inhibition = squeeze(iInhibit(exp,:,:));
-    voltages = runTemp(conductanceMat, compartmentIDs, input, condParams);
+    voltages = runSimulation(conductanceMat, compartmentIDs, input, condParams);
     maxV(1,exp) = max(voltages(1,:));
 end
 
@@ -197,7 +200,7 @@ for exp = 1:size(iExcite,1)
     exp
     input.excitation = squeeze(iExcite(exp,:,:));
     input.inhibition = squeeze(iInhibit(exp,:,:));
-    voltages = runTemp(conductanceMat, compartmentIDs, input, condParams);
+    voltages = runSimulation(conductanceMat, compartmentIDs, input, condParams);
     maxV(2,exp) = max(voltages(1,:));
 end
 
