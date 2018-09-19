@@ -1,4 +1,4 @@
-function [ connect cIDs conduct] = buildDendriticArbor( input )
+function [ connect cIDs conduct dist] = buildDendriticArbor( input )
 %BUILDDENDRITICARBOR Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -116,6 +116,9 @@ for c = 2:size(cIDs,2)
         [connect cIDs tempParents conduct] = addCompartment(connect,cIDs,compType,c,tempParents,conduct,parameters);
     end
 end
+
+g = graph(connect);
+dist = distances(g);
 
 end
 

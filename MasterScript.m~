@@ -34,7 +34,7 @@ for exp = 1:size(iExcite,1)
     exp
     input.excitation = squeeze(iExcite(exp,:,:));
     input.inhibition = squeeze(iInhibit(exp,:,:));
-    voltages = runSimulation(conductanceMat, compartmentIDs, input, condParams);
+    voltages = runTemp(conductanceMat, compartmentIDs, input, condParams);
     maxV(exp) = max(voltages(1,:));
 end
 figure;plot(maxV);
@@ -59,7 +59,7 @@ for exp = 1:size(iExcite,1)
     exp
     input.excitation = squeeze(iExcite(exp,:,:));
     input.inhibition = squeeze(iInhibit(exp,:,:));
-    voltages = runSimulation(conductanceMat, compartmentIDs, input, condParams);
+    voltages = runTemp(conductanceMat, compartmentIDs, input, condParams);
     maxV(exp) = max(voltages(1,:));
 end
 figure;plot(maxV);
@@ -84,7 +84,7 @@ for exp = 1:size(iExcite,1)
     exp
     input.excitation = squeeze(iExcite(exp,:,:));
     input.inhibition = squeeze(iInhibit(exp,:,:));
-    voltages = runSimulation(conductanceMat, compartmentIDs, input, condParams);
+    voltages = runTemp(conductanceMat, compartmentIDs, input, condParams);
     maxV(exp) = max(voltages(1,:));
 end
 figure;plot(maxV);
@@ -112,7 +112,7 @@ for exp = 1:size(iExcite,1)
     exp
     input.excitation = squeeze(iExcite(exp,:,:));
     input.inhibition = squeeze(iInhibit(exp,:,:));
-    voltages = runSimulation(conductanceMat, compartmentIDs, input, condParams);
+    voltages = runTemp(conductanceMat, compartmentIDs, input, condParams);
     maxV(exp) = max(voltages(1,:));
 end
 figure;plot(maxV);
@@ -178,7 +178,7 @@ for exp = 1:size(iExcite,1)
     exp
     input.excitation = squeeze(iExcite(exp,:,:));
     input.inhibition = squeeze(iInhibit(exp,:,:));
-    voltages = runSimulation(conductanceMat, compartmentIDs, input, condParams);
+    voltages = runTemp(conductanceMat, compartmentIDs, input, condParams);
     maxV(1,exp) = max(voltages(1,:));
 end
 
@@ -197,7 +197,7 @@ for exp = 1:size(iExcite,1)
     exp
     input.excitation = squeeze(iExcite(exp,:,:));
     input.inhibition = squeeze(iInhibit(exp,:,:));
-    voltages = runSimulation(conductanceMat, compartmentIDs, input, condParams);
+    voltages = runTemp(conductanceMat, compartmentIDs, input, condParams);
     maxV(2,exp) = max(voltages(1,:));
 end
 
