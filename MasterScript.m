@@ -131,7 +131,7 @@ iInhibit = zeros(10,totalCompartments,miscParams.time);
 %% Setup of multiple simulations
 
 stimRange = 0:1:10; %range of intensities to use for stimulation
-simulationCount = 100; %number of simulations for each intensity
+simulationCount = 10; %number of simulations for each intensity
 nodesInCluster = 4; %up to how many compartments to stimulate in a cluster
 
 clusterRange = zeros(length(stimRange),nodesInCluster); %matrix holding the average maximum voltage deflection for each stim level, clustered
