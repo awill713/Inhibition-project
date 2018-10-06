@@ -2,7 +2,7 @@
 %levels FOR THE OLD DENDRITIC ARBOR and plots the results as a heatmap
 
 clear;
-close all;
+% close all;
 
 %% Load parameters
 [miscParams dendParams condParams ] = loadParameters;
