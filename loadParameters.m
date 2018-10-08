@@ -3,7 +3,7 @@ function [ misc dend cond ] = loadParameters( input_args )
 %   Detailed explanation goes here
 
 %% Miscellaneous parameters
-misc.totalTime=100;%length of sim in ms
+misc.totalTime=50;%length of sim in ms
 misc.dt = 0.1; %ms
 misc.time = round(misc.totalTime/misc.dt);
 

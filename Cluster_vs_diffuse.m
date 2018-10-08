@@ -6,15 +6,15 @@
 
 
 clear;
-close all;
+% close all;
 
 %% Load dendritic arbor parameters
 [miscParams dendParams condParams ] = loadParameters;
 
 %% Setup of multiple simulations
 
-stimRange = 0:1:20; %range of intensities to use for stimulation
-simulationCount = 50; %number of simulations for each intensity
+stimRange = 0:0.1:30; %range of intensities to use for stimulation
+simulationCount = 100; %number of simulations for each intensity
 nodesInCluster = 4; %up to how many compartments to stimulate in a cluster
 
 stimOn = 150;
@@ -176,19 +176,23 @@ ylabel(c,'Difference between clustered and diffuse AUC')
 
 %% Save everything
 
-% data.dendParams = dendParams;
-% data.miscParams = miscParams;
-% data.condParams = condParams;
-% data.stimRange = stimRange;
-% data.simulationCount = simulationCount;
-% data.nodesInCluster = nodesInCluster;
-% data.clusterData = clusterRange;
-% data.diffuseData = diffuseRange;
-% 
-% currentFolder = pwd;
-% save([pwd '/Figures/cluster_vs_diffuse_data.mat'],'data');
-% saveas(f1,[pwd '/Figures/clustered vs diffuse ratio.fig']);
-% saveas(f2,[pwd '/Figures/clustered vs diffuse difference.fig']);
+data.dendParams = dendParams;
+data.miscParams = miscParams;
+data.condParams = condParams;
+data.stimRange = stimRange;
+data.simulationCount = simulationCount;
+data.nodesInCluster = nodesInCluster;
+data.clusterData = clusterRange;
+data.diffuseData = diffuseRange;
+data.clusterDataAUC = clusterRangeAUC;
+data.diffuseDataAUC = diffuseRangeAUC;
+
+currentFolder = pwd;
+save([pwd '/Figures/cluster_vs_diffuse_data.mat'],'data');
+saveas(f1,[pwd '/Figures/clustered vs diffuse ratio.fig']);
+saveas(f2,[pwd '/Figures/clustered vs diffuse difference.fig']);
+saveas(f3,[pwd '/Figures/clustered vs diffuse AUC ratio.fig']);
+saveas(f4,[pwd '/Figures/clustered vs diffuse AUC difference.fig']);
 
 %% Plot clustered vs diffuse data for single simulation (used prior to implementation of multi-simulation for loop
 % figure;plot(maxV(1,:));
