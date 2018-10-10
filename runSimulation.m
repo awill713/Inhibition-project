@@ -1,4 +1,4 @@
-function [ voltage u ] = runSimulation( dendConduct, compIDs, extInput, par)
+function [ voltage ] = runSimulation( dendConduct, compIDs, extInput, par)
 %RUNSIMULATION Summary of this function goes here
 %   Faster implementation, clean variables naming/code later
 

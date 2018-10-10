@@ -41,17 +41,22 @@ for exp = 1:size(iExcite,1)
     maxV(exp) = max(voltages(1,:));
     somaAUC(exp) = sum(voltages(1,150:250)-condParams.vRest);
 end
+
+AUCpredicted = sum((-60+(maxV(1,1)+60).*(1:1:maxIntensity)) - condParams.vRest);
+AUCmaxV = (sum(maxV-condParams.vRest) - AUCpredicted) / AUCpredicted;
 figure;plot(maxV);
 hold on;
 plot(-60+(maxV(1,1)+60).*(1:1:maxIntensity));
 legend('Observed','Predicted');
-title('Apical shaft excitation is (sub)linear');
+title(['Apical shaft excitation is (sub)linear, nonlinearity index = ' num2str(AUCmaxV)]);
 
+AUCpredicted = sum(somaAUC(1,1).*(1:1:maxIntensity));
+AUCsomaAUC = (sum(somaAUC) - AUCpredicted) / AUCpredicted;
 figure;plot(somaAUC);
 hold on;
 plot(somaAUC(1,1).*(1:1:maxIntensity));
 legend('Observed','Predicted');
-title('Apical shaft area under curve');
+title(['Apical shaft area under curve, nonlinearity index = ' num2str(AUCsomaAUC)]);
 
 iExcite = zeros(maxIntensity,totalCompartments,miscParams.time);
 iInhibit = zeros(maxIntensity,totalCompartments,miscParams.time);
@@ -70,21 +75,26 @@ for exp = 1:size(iExcite,1)
     exp
     input.excitation = squeeze(iExcite(exp,:,:));
     input.inhibition = squeeze(iInhibit(exp,:,:));
-    [voltages uTime] = runSimulation(conductanceMat, compartmentIDs, input, condParams);
+    voltages = runSimulation(conductanceMat, compartmentIDs, input, condParams);
     maxV(exp) = max(voltages(1,:));
     somaAUC(exp) = sum(voltages(1,150:250)-condParams.vRest);
 end
+
+AUCpredicted = sum((-60+(maxV(1,1)+60).*(1:1:maxIntensity)) - condParams.vRest);
+AUCmaxV = (sum(maxV-condParams.vRest) - AUCpredicted) / AUCpredicted;
 figure;plot(maxV);
 hold on;
 plot(-60+(maxV(1,1)+60).*(1:1:maxIntensity));
 legend('Observed','Predicted');
-title('Apical spine excitation is supralinear');
+title(['Apical spine excitation is supralinear, nonlinearity index = ' num2str(AUCmaxV)]);
 
+AUCpredicted = sum(somaAUC(1,1).*(1:1:maxIntensity));
+AUCsomaAUC = (sum(somaAUC) - AUCpredicted) / AUCpredicted;
 figure;plot(somaAUC);
 hold on;
 plot(somaAUC(1,1).*(1:1:maxIntensity));
 legend('Observed','Predicted');
-title('Apical spine area under curve');
+title(['Apical spine area under curve, nonlinearity index = ' num2str(AUCsomaAUC)]);
 
 %% Basal shaft - specify excitatory and inhibitory input
 iExcite = zeros(maxIntensity,totalCompartments,miscParams.time);
@@ -107,17 +117,22 @@ for exp = 1:size(iExcite,1)
     maxV(exp) = max(voltages(1,:));
     somaAUC(exp) = sum(voltages(1,150:250)-condParams.vRest);
 end
+
+AUCpredicted = sum((-60+(maxV(1,1)+60).*(1:1:maxIntensity)) - condParams.vRest);
+AUCmaxV = (sum(maxV-condParams.vRest) - AUCpredicted) / AUCpredicted;
 figure;plot(maxV);
 hold on;
 plot(-60+(maxV(1,1)+60).*(1:1:maxIntensity));
 legend('Observed','Predicted');
-title('Basal shaft excitation is (sub)linear');
+title(['Basal shaft excitation is (sub)linear, nonlinearity index = ' num2str(AUCmaxV)]);
 
+AUCpredicted = sum(somaAUC(1,1).*(1:1:maxIntensity));
+AUCsomaAUC = (sum(somaAUC) - AUCpredicted) / AUCpredicted;
 figure;plot(somaAUC);
 hold on;
 plot(somaAUC(1,1).*(1:1:maxIntensity));
 legend('Observed','Predicted');
-title('Basal shaft area under curve');
+title(['Basal shaft area under curve, nonlinearity index = ' num2str(AUCsomaAUC)]);
 
 %% Basal spine - specify excitatory and inhibitory input
 iExcite = zeros(maxIntensity,totalCompartments,miscParams.time);
@@ -140,14 +155,19 @@ for exp = 1:size(iExcite,1)
     maxV(exp) = max(voltages(1,:));
     somaAUC(exp) = sum(voltages(1,150:250)-condParams.vRest);
 end
+
+AUCpredicted = sum((-60+(maxV(1,1)+60).*(1:1:maxIntensity)) - condParams.vRest);
+AUCmaxV = (sum(maxV-condParams.vRest) - AUCpredicted) / AUCpredicted;
 figure;plot(maxV);
 hold on;
 plot(-60+(maxV(1,1)+60).*(1:1:maxIntensity));
 legend('Observed','Predicted');
-title('Basal spine excitation is supralinear');
+title(['Basal spine excitation is supralinear, nonlinearity index = ' num2str(AUCmaxV)]);
 
+AUCpredicted = sum(somaAUC(1,1).*(1:1:maxIntensity));
+AUCsomaAUC = (sum(somaAUC) - AUCpredicted) / AUCpredicted;
 figure;plot(somaAUC);
 hold on;
 plot(somaAUC(1,1).*(1:1:maxIntensity));
 legend('Observed','Predicted');
-title('Basal spine area under curve');
+title(['Basal spine area under curve, nonlinearity index = ' num2str(AUCsomaAUC)]);

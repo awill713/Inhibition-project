@@ -8,8 +8,8 @@ close all;
 %% Design simulation parameters
 
 repeats = 5;
-stimLevel = 7;
-inhibitionLevel = 1;
+stimRange = 1:1:10;
+inhibitionLevel = 5;
 
 %% Choose locations of inhibition
 %if you add new compartments to the list, update the function
@@ -59,43 +59,111 @@ for r = 1:repeats
     %matrix holding soma voltage trace for entire experiment for each
     %combination of excitation and inhibition location. To be averaged
     %after all repetitions.
-    tempOutput = zeros(length(excComp), length(inhComp),miscParams.time);
+    tempOutput = zeros(length(excComp), length(inhComp),4);
     
     for exc = 1:length(excComp)
         
         %compartment to receive excitation this round
         excChoice = excComp(exc);
-
+        
         for inh = 1:length(inhComp)
             
             %compartment to receive inhibition this round
             inhChoice = inhComp(inh);
             
-            %implement excited/inhibited compartments in this run's
-            %simulation design
-            iExcite = zeros(totalCompartments,miscParams.time);
-            iExcite(excChoice,150:200) = stimLevel;
+            maxV = zeros(1,length(stimRange));
+            somaAUC = zeros(1,length(stimRange));
+            inhV = zeros(1,length(stimRange));
+            inhAUC = zeros(1,length(stimRange));
             
-            iInhibit = zeros(totalCompartments,miscParams.time);
-            iInhibit(inhChoice,150:200) = inhibitionLevel;
+            %First run simulations of increasing excitatory intensity
+            %without inhibition, to get the "baseline" nonlinearity index
+            for s = 1:length(stimRange)
+                
+                stimLevel = stimRange(s);
+                
+                %implement excited/inhibited compartments in this run's
+                %simulation design
+                iExcite = zeros(totalCompartments,miscParams.time);
+                iExcite(excChoice,150:200) = stimLevel;
+                
+                iInhibit = zeros(totalCompartments,miscParams.time);
+                iInhibit(inhChoice,150:200) = 0;
+                
+                input.excitation = iExcite;
+                input.inhibition = iInhibit;
+                
+                %run simulation
+                voltages = runSimulation(conductanceMat, compartmentIDs, input, condParams);
+                
+                maxV(s) = max(voltages(1,:));
+                somaAUC(s) = sum(voltages(1,150:250)-condParams.vRest);
+                
+                
+                iInhibit(inhChoice,150:200) = inhibitionLevel;
+                input.inhibition = iInhibit;
+                
+                %run simulation
+                voltages = runSimulation(conductanceMat, compartmentIDs, input, condParams);
+                
+                inhV(s) = max(voltages(1,:));
+                inhAUC(s) = sum(voltages(1,150:250)-condParams.vRest);
+                
+            end
             
-            input.excitation = iExcite;
-            input.inhibition = iInhibit;
+            predictedMaxV = -60+(maxV(1,1)+60).*(stimRange);
+            predictedAUC = somaAUC(1,1)*stimRange;
             
-            %run simulation
-            voltages = runSimulation(conductanceMat, compartmentIDs, input, condParams);
+            AUCpredictedMaxV = sum(predictedMaxV - predictedMaxV(1));
+            AUCpredictedAUC = sum(predictedAUC - predictedAUC(1));
             
-            tempTrace = voltages(1,:);
-            tempOutput(exc,inh,:) = tempTrace;
+            AUCbaselineMaxV = sum(maxV - predictedMaxV(1));
+            AUCbaselineAUC = sum(somaAUC - predictedAUC(1));
+            
+            AUCinhibitionMaxV = sum(inhV - predictedMaxV(1));
+            AUCinhibitionAUC = sum(inhAUC - predictedAUC(1));
+            
+            baselineIndexMaxV  = AUCbaselineMaxV / AUCpredictedMaxV;
+            baselineIndexAUC = AUCbaselineAUC / AUCpredictedAUC;
+            inhibitionIndexMaxV = AUCinhibitionMaxV / AUCpredictedMaxV;
+            inhibitionIndexAUC = AUCinhibitionAUC / AUCpredictedAUC;
+            
+            tempOutput(exc,inh,1) = baselineIndexMaxV;
+            tempOutput(exc,inh,2) = baselineIndexAUC;
+            tempOutput(exc,inh,3) = inhibitionIndexMaxV;
+            tempOutput(exc,inh,4) = inhibitionIndexAUC;
+            
         end
     end
-    
-    %store tempOutput (somatic voltage trace for each combination of
-    %excitation/inhibition) in ultimate variable "output." Could choose to
-    %directly store it in "output" without tempOutput, but thought this was
-    %a bit cleaner?
-    output(:,:,:,r) = tempOutput;
 end
+
+
+%%
+
+for i = 1:size(tempOutput,1)
+    figure;
+    for j = 1:size(tempOutput,2)
+        subplot(1,size(tempOutput,2),j);hold on;
+        bar(1,tempOutput(i,j,1));
+        bar(2,tempOutput(i,j,3));
+        xlabel(['Inhibition ' inhibitionLocations{j}]);
+        if j == 1
+            ylabel(['Excitation ' excitationLocations{i}]);
+        end
+    
+    end
+end
+
+%{
+
+%%
+
+%store tempOutput (somatic voltage trace for each combination of
+%excitation/inhibition) in ultimate variable "output." Could choose to
+%directly store it in "output" without tempOutput, but thought this was
+%a bit cleaner?
+% output(:,:,:,r) = tempOutput;
+
 
 somaTraceMean = mean(output,4);
 somaTraceSTD = std(output,[],4);
@@ -149,11 +217,12 @@ for fExc = 1:size(somaTraceMean,1)
     %also plot duration and integration of deviation
 end
 
-%ultimately though, after verifying that these inhibition results are
-%satisfactory and well understood, we want to compare the effects of
-%inhibition location on the sub/supralinear summation properties, which
-%entails cycling through a range of excitation intensities
+ultimately though, after verifying that these inhibition results are
+satisfactory and well understood, we want to compare the effects of
+inhibition location on the sub/supralinear summation properties, which
+entails cycling through a range of excitation intensities
 
+%}
 
 %%
     
