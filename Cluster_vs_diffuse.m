@@ -13,7 +13,7 @@ clear;
 
 %% Setup of multiple simulations
 
-stimRange = 1:0.1:30; %range of intensities to use for stimulation
+stimRange = 1:1:30; %range of intensities to use for stimulation
 simulationCount = 100; %number of simulations for each intensity
 nodesInCluster = 4; %up to how many compartments to stimulate in a cluster
 

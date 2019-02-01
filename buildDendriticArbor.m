@@ -105,12 +105,12 @@ while level < parameters.tuftDepth && length(parentCompartments)>0
 end
 
 %% Visualize connectome structure
-% g = graph(connect);
-% figure; h = plot(g);
-% highlight(h,cIDs(1,find(cIDs(2,:)==1)),'NodeColor','g');
-% highlight(h,cIDs(1,find(cIDs(2,:)==2)),'NodeColor','k');
-% highlight(h,cIDs(1,find(cIDs(2,:)==3)),'NodeColor','r');
-% title('Green is basal dendrites, black is apical, red is apical tuft');
+g = graph(connect);
+figure; h = plot(g);
+highlight(h,cIDs(1,find(cIDs(2,:)==1)),'NodeColor','g');
+highlight(h,cIDs(1,find(cIDs(2,:)==2)),'NodeColor','k');
+highlight(h,cIDs(1,find(cIDs(2,:)==3)),'NodeColor','r');
+title('Green is basal dendrites, black is apical, red is apical tuft');
 
 %% Add dendritic spines
 compType = 4;

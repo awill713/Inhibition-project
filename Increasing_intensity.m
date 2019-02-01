@@ -18,7 +18,7 @@ totalCompartments = size(compartmentIDs,2);
 
 stimOn = 150;
 stimOff = 200;
-maxIntensity = 30;
+maxIntensity = 40;
 
 %% Apical shaft - specify excitatory and inhibitory input
 iExcite = zeros(maxIntensity,totalCompartments,miscParams.time);
