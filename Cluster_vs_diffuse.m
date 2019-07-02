@@ -13,8 +13,8 @@ clear;
 
 %% Setup of multiple simulations
 
-stimRange = 1:1:30; %range of intensities to use for stimulation
-simulationCount = 100; %number of simulations for each intensity
+stimRange = 1:0.1:10; %range of intensities to use for stimulation
+simulationCount = 10; %number of simulations for each intensity
 nodesInCluster = 4; %up to how many compartments to stimulate in a cluster
 
 stimOn = 150;
@@ -30,7 +30,7 @@ diffuseRangeAUC = zeros(length(stimRange),nodesInCluster);
 
 for sl = 1:length(stimRange)
     
-    stimLevel = stimRange(sl); %stim level to use for this batch of simulations
+    stimLevel = stimRange(sl) %stim level to use for this batch of simulations
     
     clustMat = zeros(simulationCount,nodesInCluster); %maximum voltage deflections for every clustered simulation
     diffuseMat = zeros(simulationCount,nodesInCluster); %maximum voltage deflections for every diffuse simulation
@@ -48,18 +48,19 @@ for sl = 1:length(stimRange)
         %% Choose compartments for clustered and diffuse excitation conditions
         distAndComp = [];
         
-        %find four clustered and diffuse spines
+        %find the clustered and diffuse spines
         %clustered:
-%         originalSpine = max(find(compartmentIDs(2,:)==4));
-        originalSpine = datasample(compartmentIDs(1,find(compartmentIDs(2,:)==4)),1); %which spine should we find the neighbors of, chosen randomly from entire neuron
+%         originalSpine = max(find(compartmentIDs(2,:)==4)); %most distal spine
+        originalSpine = datasample(compartmentIDs(1,find(compartmentIDs(2,:)==4)),1); %randomly choose spine
+        
         distAndComp(1,:) = distance(originalSpine,:); %distances of all compartments from originalSpine
         distAndComp(2:3,:) = compartmentIDs(:,:); %second and third rows are compartment compartment ID and compartment type, respectively
         distAndComp = sortrows(distAndComp',1)'; %sort the columns based on increasing distance from originalSpine (elements of first row)
-        distAndComp = distAndComp(:,find(distAndComp(3,:)==4)); %only allow spines, whose compartment type (row 3) == 4
-        clustered = distAndComp(2,1:nodesInCluster); %take the four closest compartments (compartment ID is row 2)
-        clustered(2,:) = distance(clustered(1,:)); %make second row of the distance from soma
+        distAndComp = distAndComp(:,find(distAndComp(3,:)==4)); %only allow spines, compartment type (row 3) == 4
+        clustered = distAndComp(2,1:nodesInCluster); %take the "nodesInCluster" number of closest compartments (compartment ID is row 2)
+        clustered(2,:) = distance(clustered(1,:)); %make second row the distance from soma
         clustered = sortrows(clustered',2)'; %sort based on distance from soma
-        clustered = clustered(1,:); %take the first row
+        clustered = clustered(1,:); %take the first row, aka the spine compartments themselves
         
         %diffuse (randomly pick compartments whose distance from soma is equal to
         %those compartments in the clustered group):
@@ -81,10 +82,10 @@ for sl = 1:length(stimRange)
         
         %% Set up clustered excitation
         
-        iExcite = zeros(4,totalCompartments,miscParams.time);
-        iInhibit = zeros(4,totalCompartments,miscParams.time);
+        iExcite = zeros(nodesInCluster,totalCompartments,miscParams.time);
+        iInhibit = zeros(nodesInCluster,totalCompartments,miscParams.time);
         
-        for c = 1:4
+        for c = 1:nodesInCluster
             iExcite(c,clustered(1:c),stimOn:stimOff) = stimLevel;
         end
         
@@ -93,7 +94,6 @@ for sl = 1:length(stimRange)
         
         %% Run model for clustered excitation
         for exp = 1:size(iExcite,1)
-            %     exp
             input.excitation = squeeze(iExcite(exp,:,:));
             input.inhibition = squeeze(iInhibit(exp,:,:));
             voltages = runSimulation(conductanceMat, compartmentIDs, input, condParams);
@@ -103,17 +103,16 @@ for sl = 1:length(stimRange)
         
         %% Set up diffuse excitation
         
-        iExcite = zeros(4,totalCompartments,miscParams.time);
-        iInhibit = zeros(4,totalCompartments,miscParams.time);
+        iExcite = zeros(nodesInCluster,totalCompartments,miscParams.time);
+        iInhibit = zeros(nodesInCluster,totalCompartments,miscParams.time);
         
-        for c = 1:4
+        for c = 1:nodesInCluster
             iExcite(c,diffuse(1:c),stimOn:stimOff) = stimLevel;
         end
         
         
         %% Run model for diffuse excitation
         for exp = 1:size(iExcite,1)
-            %     exp
             input.excitation = squeeze(iExcite(exp,:,:));
             input.inhibition = squeeze(iInhibit(exp,:,:));
             voltages = runSimulation(conductanceMat, compartmentIDs, input, condParams);
@@ -142,7 +141,7 @@ for sl = 1:length(stimRange)
 end
 
 %% Plot results (either ratio or difference between clustered and diffuse for each stim level)
-f1 = figure(1); colormap jet;
+f1 = figure; colormap jet;
 imagesc(1:nodesInCluster,stimRange,(clusterRange+60) ./ (diffuseRange+60));
 title('Ratio of clustered and diffuse maximum voltage deflection');
 xlabel('Number of stimulated compartments');
@@ -150,7 +149,7 @@ ylabel('Stimulation level');
 c = colorbar;
 ylabel(c,'Ratio of clustered to diffuse maximum voltage deflection')
 
-f2 = figure(2); colormap jet;
+f2 = figure; colormap jet;
 imagesc(1:nodesInCluster,stimRange,(clusterRange+60) - (diffuseRange+60));
 title('Difference between clustered and diffuse maximum voltage deflection');
 xlabel('Number of stimulated compartments');
@@ -158,7 +157,7 @@ ylabel('Stimulation level');
 c = colorbar;
 ylabel(c,'Difference between clustered and diffuse maximum voltage deflection')
 
-f3 = figure(3); colormap jet;
+f3 = figure; colormap jet;
 imagesc(1:nodesInCluster,stimRange,clusterRangeAUC ./ diffuseRangeAUC);
 title('Ratio of clustered and diffuse maximum AUC');
 xlabel('Number of stimulated compartments');
@@ -166,7 +165,7 @@ ylabel('Stimulation level');
 c = colorbar;
 ylabel(c,'Ratio of clustered to diffuse maximum AUC')
 
-f4 = figure(4); colormap jet;
+f4 = figure; colormap jet;
 imagesc(1:nodesInCluster,stimRange,clusterRangeAUC - diffuseRangeAUC);
 title('Difference between clustered and diffuse AUC');
 xlabel('Number of stimulated compartments');
@@ -174,31 +173,31 @@ ylabel('Stimulation level');
 c = colorbar;
 ylabel(c,'Difference between clustered and diffuse AUC')
 
-predictedAUCclust = zeros(1,4);
-predictedAUCdiff = zeros(1,4);
-AUCclustMaxV = zeros(1,4);
-AUCdiffMaxV = zeros(1,4);
-AUCclustAUC = zeros(1,4);
-AUCdiffAUC = zeros(1,4);
-for i = 1:4
+predictedAUCclust = zeros(1,nodesInCluster);
+predictedAUCdiff = zeros(1,nodesInCluster);
+AUCclustMaxV = zeros(1,nodesInCluster);
+AUCdiffMaxV = zeros(1,nodesInCluster);
+AUCclustAUC = zeros(1,nodesInCluster);
+AUCdiffAUC = zeros(1,nodesInCluster);
+for i = 1:nodesInCluster
     predictedAUCclust(i) = sum((-60+(clusterRange(1,i)+60)*stimRange) - condParams.vRest);
     predictedAUCdiff(i) = sum((-60+(diffuseRange(1,i)+60)*stimRange) - condParams.vRest);
-    AUCclustMaxV(i) = (sum(clusterRange(:,i) - condParams.vRest) - predictedAUCclust(i)) / predictedAUCdiff(i);
+    AUCclustMaxV(i) = (sum(clusterRange(:,i) - condParams.vRest) - predictedAUCclust(i)) / predictedAUCclust(i);
     AUCdiffMaxV(i) = (sum(diffuseRange(:,i) - condParams.vRest) - predictedAUCdiff(i)) / predictedAUCdiff(i);
     
     predictedAUCclust(i) = sum(clusterRangeAUC(1,i)*stimRange);
     predictedAUCdiff(i) = sum(diffuseRangeAUC(1,i)*stimRange);
-    AUCclustAUC(i) = (sum(clusterRangeAUC(:,i)) - predictedAUCclust(i)) / predictedAUCdiff(i);
+    AUCclustAUC(i) = (sum(clusterRangeAUC(:,i)) - predictedAUCclust(i)) / predictedAUCclust(i);
     AUCdiffAUC(i) = (sum(diffuseRangeAUC(:,i)) - predictedAUCdiff(i)) / predictedAUCdiff(i);
         
-    if i==4
+    if i==nodesInCluster
         f5 = figure;hold on;
         plot(stimRange,clusterRange(:,i));
         plot(stimRange,-60+(clusterRange(1,i)+60)*stimRange);
         plot(stimRange,diffuseRange(:,i));
         plot(stimRange,-60+(diffuseRange(1,i)+60)*stimRange);
         legend({'Clust obs','Clust pred','Diff obs','Diff pred'});
-        title('Somatic maximum voltage, stimulating 4 spines');
+        title(['Somatic maximum voltage, stimulating ' num2str(nodesInCluster) ' spines']);
         xlabel('Stimulation level');
         ylabel('Maximum somatic voltage (mV)');
         
@@ -208,7 +207,7 @@ for i = 1:4
         plot(stimRange,diffuseRangeAUC(:,i));
         plot(stimRange,diffuseRangeAUC(1,i)*stimRange);
         legend({'Clust obs','Clust pred','Diff obs','Diff pred'});
-        title('Somatic voltage area under curve, stimulating 4 spines');
+        title(['Somatic voltage area under curve, stimulating ' num2str(nodesInCluster) ' spines']);
         xlabel('Stimulation level');
         ylabel('mVolt * time ...?');
     end
@@ -249,28 +248,14 @@ data.clusterData = clusterRange;
 data.diffuseData = diffuseRange;
 data.clusterDataAUC = clusterRangeAUC;
 data.diffuseDataAUC = diffuseRangeAUC;
-
-currentFolder = pwd;
-save([pwd '/Figures/cluster_vs_diffuse_data.mat'],'data');
-saveas(f1,[pwd '/Figures/clustered vs diffuse ratio.fig']);
-saveas(f2,[pwd '/Figures/clustered vs diffuse difference.fig']);
-saveas(f3,[pwd '/Figures/clustered vs diffuse AUC ratio.fig']);
-saveas(f4,[pwd '/Figures/clustered vs diffuse AUC difference.fig']);
-saveas(f5,[pwd '/Figures/clustered vs diffuse vs predicted.fig']);
-saveas(f6,[pwd '/Figures/clustered vs diffuse vs predicted AUC.fig']);
-saveas(f7,[pwd '/Figures/clustered vs diffuse nonlinearity index.fig']);
-saveas(f8,[pwd '/Figures/clustered vs diffuse AUC nonlinearity index.fig']);
-
-%% Plot clustered vs diffuse data for single simulation (used prior to implementation of multi-simulation for loop
-% figure;plot(maxV(1,:));
-% hold on;
-% plot(maxV(2,:))
-% legend('Clustered','Diffuse');
-% % clustered
-% % diffuse
-% g = graph(connectome);
-% figure; h = plot(g);
-% highlight(h,setdiff(clustered,diffuse),'NodeColor','g');
-% highlight(h,setdiff(diffuse,clustered),'NodeColor','r');
-% highlight(h,intersect(clustered,diffuse),'NodeColor','k');
-% title('Green is clustered, red is diffuse, black is both');
+% 
+% currentFolder = pwd;
+% save([pwd '/Figures/cluster_vs_diffuse_data.mat'],'data');
+% saveas(f1,[pwd '/Figures/clustered vs diffuse ratio.fig']);
+% saveas(f2,[pwd '/Figures/clustered vs diffuse difference.fig']);
+% saveas(f3,[pwd '/Figures/clustered vs diffuse AUC ratio.fig']);
+% saveas(f4,[pwd '/Figures/clustered vs diffuse AUC difference.fig']);
+% saveas(f5,[pwd '/Figures/clustered vs diffuse vs predicted.fig']);
+% saveas(f6,[pwd '/Figures/clustered vs diffuse vs predicted AUC.fig']);
+% saveas(f7,[pwd '/Figures/clustered vs diffuse nonlinearity index.fig']);
+% saveas(f8,[pwd '/Figures/clustered vs diffuse AUC nonlinearity index.fig']);

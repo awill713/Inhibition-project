@@ -172,10 +172,11 @@ end
 % for ii = 1:length(inhibitionLevel)
 
 %exc 7 inh 30, exc 13/8/7 inh 100, exc 13/20/21 inh 150
-for ii = 4:4
+for ii = 1:1
     inhIntense = inhibitionLevel(ii);
 % intensitiesToPlot = [1 4 5 6 7 8 10];
 intensitiesToPlot = [1 5 6 7 8 11 12 13 19 20 21 22];
+% intensitiesToPlot = 1:1:30;
 for i = 1:length(intensitiesToPlot)
     intense = intensitiesToPlot(i);
     figure;

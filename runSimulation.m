@@ -36,13 +36,22 @@ u = zeros(totalCompartments,params.timePoints);
 
 for t = 2:params.timePoints
   
+    %ORIGINAL AND CORRECT pvt (active spines)
   pvt = (p.shaftK * ( voltage(:,t-1)  - p.vRest).*group_masks(:,:,1) .* (voltage(:,t-1)-p.vThresh).* group_masks(:,:,1) - u(:,t-1).*group_masks(:,:,1))+...
        p.shaftK * ( p.vRest - voltage(:,t-1)).*group_masks(:,:,2) +...
        p.shaftK * ( p.vRest - voltage(:,t-1)).*group_masks(:,:,3) +...
        p.shaftK * ( p.vRest - voltage(:,t-1)).*group_masks(:,:,4) +...
       (p.spineK * ( voltage(:,t-1)  - p.vRest).*group_masks(:,:,5) .* (voltage(:,t-1)-p.vThresh).* group_masks(:,:,5) - u(:,t-1).*group_masks(:,:,5));
       
-  
+
+    %SO SPINES ARE PASSIVE
+%   pvt = (p.shaftK * ( voltage(:,t-1)  - p.vRest).*group_masks(:,:,1) .* (voltage(:,t-1)-p.vThresh).* group_masks(:,:,1) - u(:,t-1).*group_masks(:,:,1))+...
+%        p.shaftK * ( p.vRest - voltage(:,t-1)).*group_masks(:,:,2) +...
+%        p.shaftK * ( p.vRest - voltage(:,t-1)).*group_masks(:,:,3) +...
+%        p.shaftK * ( p.vRest - voltage(:,t-1)).*group_masks(:,:,4) +...
+%       (p.spineK * ( p.vRest - voltage(:,t-1)).*group_masks(:,:,5));
+%       
+%   
   
   input_term = excite(:,t-1).*(p.vNa - voltage(:,t-1)) + inhibit(:,t-1).*(p.vCl - voltage(:,t-1));
   
@@ -76,6 +85,7 @@ for comp = 1:length(v)
         k = p.spineK;
         CC = p.Celse;
         previousVoltageTerm = k*(vNow-p.vRest)*(vNow-p.vThresh) - you(comp);
+%         previousVoltageTerm = (p.vRest-vNow); %THIS IS TO MAKE A SPINE PASSIVE
     elseif cIDs(2,comp) == 0
         k = p.shaftK;
         CC = p.C;
