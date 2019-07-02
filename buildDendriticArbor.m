@@ -1,4 +1,4 @@
-function [ connect cIDs conduct] = buildDendriticArbor( input )
+function [ connect cIDs conduct dist] = buildDendriticArbor( input )
 %BUILDDENDRITICARBOR Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -82,7 +82,9 @@ end
 level = 0;
 parentCompartments = root;
 compType = 3;
-
+% parentCompartments
+% parameters.tuftDepth
+% level
 while level < parameters.tuftDepth && length(parentCompartments)>0
     
     level = level + 1;
@@ -99,15 +101,8 @@ while level < parameters.tuftDepth && length(parentCompartments)>0
     end
     
     parentCompartments = tempParents;
+%     display('Did apical tuft');
 end
-
-%% Visualize connectome structure
-g = graph(connect);
-figure; h = plot(g);
-highlight(h,cIDs(1,find(cIDs(2,:)==1)),'NodeColor','g');
-highlight(h,cIDs(1,find(cIDs(2,:)==2)),'NodeColor','k');
-highlight(h,cIDs(1,find(cIDs(2,:)==3)),'NodeColor','r');
-title('Green is basal dendrites, black is apical, red is apical tuft');
 
 %% Add dendritic spines
 compType = 4;
@@ -116,6 +111,17 @@ for c = 2:size(cIDs,2)
         [connect cIDs tempParents conduct] = addCompartment(connect,cIDs,compType,c,tempParents,conduct,parameters);
     end
 end
+
+g = graph(connect);
+dist = distances(g);
+
+%% Visualize connectome structure
+% g = graph(connect);
+% figure; h = plot(g);
+% highlight(h,cIDs(1,find(cIDs(2,:)==1)),'NodeColor','g');
+% highlight(h,cIDs(1,find(cIDs(2,:)==2)),'NodeColor','k');
+% highlight(h,cIDs(1,find(cIDs(2,:)==3)),'NodeColor','r');
+% title('Green is basal dendrites, black is apical, red is apical tuft');
 
 end
 

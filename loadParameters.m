@@ -3,7 +3,7 @@ function [ misc dend cond ] = loadParameters( input_args )
 %   Detailed explanation goes here
 
 %% Miscellaneous parameters
-misc.totalTime=100;%length of sim in ms
+misc.totalTime=50;%length of sim in ms, USED TO BE 50
 misc.dt = 0.1; %ms
 misc.time = round(misc.totalTime/misc.dt);
 
@@ -22,7 +22,10 @@ dend.apicalProb = [0.7 0.25 0.05]; %probability of number of branches at each br
 
 dend.tuftDepth = 5; %maximum number of compartments away from last apical shaft compartment
 dend.tuftDaughters = 2; %how many daughter branches at each branch point
-dend.tuftProb = [0.05 0.6 0.35]; %probability of number of branches at each branch point (should have length tuftDaughters+1)
+
+%changed this variable from [0.05 0.6 0.35] because the 5% chance of no
+%apical shaft compartments threw error with runSimulation edges
+dend.tuftProb = [0.00 0.6 0.4]; %probability of number of branches at each branch point (should have length tuftDaughters+1)
 
 dend.spinesPerCompartment = 1; %number of spines connected to each compartment, except for the soma
 dend.shaftConduct = 150; %conductance between shaft (and soma) compartments
@@ -34,9 +37,9 @@ cond.Celse = 50;
 cond.vRest = -60;
 cond.vThresh = -50;
 cond.a = 0.01;
-cond.b = 5;
+cond.b = -2;
 cond.c = -55;
-cond.d = 500;
+cond.d = 100;
 cond.vPeak = 50;
 cond.vNa = 0;
 cond.vCl = -70;
